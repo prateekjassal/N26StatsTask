@@ -40,6 +40,10 @@ mvn clean install
 After building, an executable jar (target/n26-stats-task-0.0.1-SNAPSHOT.jar) would be available for running the server. The application would run on port 8080 by default. No other arguments need to be passed to the jar.
 
 
+The endpoints will be available at 
+``` localhost:8080/v1/
+```
+
 
 
 

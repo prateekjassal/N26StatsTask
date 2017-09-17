@@ -34,8 +34,7 @@ I gone with just integration tests instead of unit tests due to time crunch.
 
 The project can be built with Maven which will also run the integration tests package with it. The positive integration test has a wait time of 48 seconds in it waiting for older transactions to expire to check statistics. So please do not think the test has stalled. The job logs would be constantly coming in as the job runs every second :)
 
-``` java 
-mvn clean install ```
+``` java mvn clean install ```
 
 After building, an executable jar (target/n26-stats-task-0.0.1-SNAPSHOT.jar) would be available for running the server. The application would run on port 8080 by default. No other arguments need to be passed to the jar.
 

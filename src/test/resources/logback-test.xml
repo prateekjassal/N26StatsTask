@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>
+                %d{ISO8601} %highlight(%-5p) [%t] [%logger{36}:%L]- %m%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="JOB"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/job.log</file>
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>
+                %d{ISO8601} %highlight(%-5p) [%X{jobName}] [%t] [%logger{36}:%L]- %m%n
+            </Pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>logs/archived/job.%d{yyyyMMdd}.gz
+            </fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="ASYNC-JOB" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>1</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <appender-ref ref="JOB" />
+        <includeCallerData>true</includeCallerData>
+    </appender>
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+    <logger level="info" name="job" additivity="false">
+        <appender-ref ref="ASYNC-JOB"/>
+        <appender-ref ref="STDOUT" />
+    </logger>
+</configuration>

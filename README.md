@@ -41,7 +41,8 @@ After building, an executable jar (target/n26-stats-task-0.0.1-SNAPSHOT.jar) wou
 
 
 The endpoints will be available at 
-``` localhost:8080/v1/
+``` 
+localhost:8080/v1/
 ```
 
 

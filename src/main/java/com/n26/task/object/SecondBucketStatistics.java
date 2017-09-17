@@ -129,13 +129,22 @@ public class SecondBucketStatistics {
      * 5. Transaction count
      * @param transactionAmount
      */
-    public void updateLeafStatistics(double transactionAmount) {
+    public void updateStatisticsWithTransaction(double transactionAmount) {
         this.updateSum(transactionAmount);
-        this.updateAverage();
         this.updateMin(transactionAmount);
         this.updateMax(transactionAmount);
         this.incrementCount();
+        this.updateAverage();
     }
+
+    public void accumulateStatistics(SecondBucketStatistics statistics) {
+        this.sum += statistics.sum;
+        this.count += statistics.count;
+        this.max = Math.max(max, statistics.max);
+        this.min = Math.min(min, statistics.min);
+        updateAverage();
+    }
+
 
     @Override public String toString() {
         return "SecondStatistics{" + "count=" + count + ", sum=" + sum + ", min=" + min + ", max="

@@ -1,10 +1,11 @@
-package com.n26.task.utils;
+package com.n26.task.core.impl;
 
 import com.n26.task.constants.Constants;
+import com.n26.task.core.IStatisticsRepository;
 import com.n26.task.object.SecondBucketStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 /**
  * Created by prateekjassal on 16/9/17.
@@ -26,13 +27,14 @@ import org.springframework.stereotype.Component;
  * the statistics for the last 61 seconds hence no additional array is required
  *
  */
-@Component
-public class MinuteStatisticsSegmentTree {
+@Repository("segRepo")
+public class SegmentTreeBackedStatisticsRepositoryImpl implements IStatisticsRepository {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MinuteStatisticsSegmentTree.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        SegmentTreeBackedStatisticsRepositoryImpl.class);
     private SecondBucketStatistics tree[];
 
-    private MinuteStatisticsSegmentTree() {
+    private SegmentTreeBackedStatisticsRepositoryImpl() {
         int h = (int)(Math.ceil(Math.log(Constants.INTERVAL)/Math.log(2)));
         int size = 2* (int) Math.pow(2, h) - 1;
         tree = new SecondBucketStatistics[size];
@@ -45,17 +47,20 @@ public class MinuteStatisticsSegmentTree {
      * for the last minute
      * @return
      */
-    public synchronized SecondBucketStatistics getAggregateStatistics() {
+    @Override public synchronized SecondBucketStatistics readAggregatedStatistics() {
         // Return a copy so the original does not get modified
         return new SecondBucketStatistics(tree[0]);
     }
 
-    public synchronized void update(int index, double transactionAmount, boolean isJob) {
-        if(isJob)
-            resetOldestLeafAndUpdate(0, Constants.INTERVAL-1, index, 0);
-        else
-            updateLeaf(0, Constants.INTERVAL-1, index, 0, transactionAmount);
+    @Override public synchronized void clearStatistics(int index) {
+        resetOldestLeafAndUpdate(0, Constants.INTERVAL-1, index, 0);
     }
+
+    @Override public synchronized void addTransactionStatistics(int index, double amount) {
+        updateLeaf(0, Constants.INTERVAL-1, index, 0, amount);
+    }
+
+
 
     /**
      *
@@ -68,7 +73,6 @@ public class MinuteStatisticsSegmentTree {
      * @param si - Index of the current node in the segment tree
      */
     private void resetOldestLeafAndUpdate(int start, int end, int ai, int si) {
-//        LOGGER.debug("Range: "+start+" - "+end);
         // Leaf node reached, reset the stats
         if(start == end)
         {
@@ -112,7 +116,7 @@ public class MinuteStatisticsSegmentTree {
         if(start == end)
         {
             SecondBucketStatistics clone = new SecondBucketStatistics(tree[si]);
-            clone.updateLeafStatistics(transactionAmount);
+            clone.updateStatisticsWithTransaction(transactionAmount);
             tree[si] = clone;
             LOGGER.debug("Updated index: "+si+" - "+clone);
         }
@@ -120,7 +124,7 @@ public class MinuteStatisticsSegmentTree {
         {   // Updates current node stats
             int mid = mid(start, end);
             SecondBucketStatistics clone = new SecondBucketStatistics(tree[si]);
-            clone.updateLeafStatistics(transactionAmount);
+            clone.updateStatisticsWithTransaction(transactionAmount);
             tree[si] = clone;
             LOGGER.debug("Updated index: "+si+" - "+clone);
 
@@ -160,4 +164,5 @@ public class MinuteStatisticsSegmentTree {
     private int right(int index) {
         return 2*index+2;
     }
+
 }

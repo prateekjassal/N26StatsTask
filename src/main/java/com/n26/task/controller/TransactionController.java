@@ -21,13 +21,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Transactions controller
- *
+ * <p>
  * 1. Post a new transaction with timestamp
  * 2. Fetch statistics for the current timestamp
  */
-@Controller
-@RequestMapping("/v1")
-public class TransactionController {
+@Controller @RequestMapping("/v1") public class TransactionController {
     private @Autowired IStatisticsService statisticsService;
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionController.class);
 
@@ -36,10 +34,10 @@ public class TransactionController {
         long timestamp = System.currentTimeMillis();
         long diff = timestamp - transactionData.getTimestamp();
         // A transaction with a future timestamp has been posted
-        if(diff < 0) {
-            LOGGER.error("Rejecting the request as it refers to a future timestamp");
+        if (diff < 0 || transactionData.getAmount() < 0) {
+            LOGGER.error("Rejecting the request as it is invalid");
             return ResponseEntity.badRequest().build();
-        } else if(diff > 60*1000) {
+        } else if (diff > 60 * 1000) {
             LOGGER.warn("Passing the request as it refers to an interval before 1 minute");
             // For a transaction older than 60 seconds
             return ResponseEntity.noContent().build();
@@ -53,11 +51,11 @@ public class TransactionController {
     public ResponseEntity<SecondBucketStatistics> fetchStats() {
         long timestamp = System.currentTimeMillis();
         SecondBucketStatistics secondBucketStatistics = statisticsService.readCurrentStatistics();
-        if(secondBucketStatistics.getCount()  == 0) {
+        if (secondBucketStatistics.getCount() == 0) {
             secondBucketStatistics.setMax(0);
             secondBucketStatistics.setMin(0);
         }
-        LOGGER.info("Statistics for timestamp {} : {}",timestamp, secondBucketStatistics);
+        LOGGER.info("Statistics for timestamp {} : {}", timestamp, secondBucketStatistics);
         return ResponseEntity.status(HttpStatus.OK).body(secondBucketStatistics);
     }
 

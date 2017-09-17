@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 
 /**
  *
+ * https://en.wikipedia.org/wiki/Segment_tree
+ *
  * A segment tree with the root node containing statistics for the last 1 minute
  * Has 61 leaves, each leaf containing the statistics for a second
  * Each leaf represents a bucket containing statistics for that second
@@ -69,7 +71,7 @@ public class SegmentTreeBackedStatisticsRepositoryImpl implements IStatisticsRep
      * (oldest leaf is the second that just passed the 1 minute mark)
      * @param start - Segment tree array's first index
      * @param end - Segment tree array's last index
-     * @param ai - Bucket index in terms of the interval i.e. (0-60)
+     * @param ai - Bucket index in terms of the interval i.e. (0-60). Will refer to one of the 61 leaf nodes
      * @param si - Index of the current node in the segment tree
      */
     private void resetOldestLeafAndUpdate(int start, int end, int ai, int si) {
@@ -106,7 +108,7 @@ public class SegmentTreeBackedStatisticsRepositoryImpl implements IStatisticsRep
      *
      * @param start - Segment tree array's first index
      * @param end - Segment tree array's last index
-     * @param ai - Bucket index in terms of the interval i.e. (0-60)
+     * @param ai - Bucket index in terms of the interval i.e. (0-60). Will refer to one of the 61 leaf nodes
      * @param si - Index of the current node in the segment tree
      * @param transactionAmount - Amount of the transaction to be added
      */

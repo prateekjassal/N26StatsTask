@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class StatisticsServiceImpl implements IStatisticsService {
-//    @Qualifier("arrayRepo")
-    @Qualifier("segRepo")
+    @Qualifier("arrayRepo")
+//    @Qualifier("segRepo")
     @Autowired private IStatisticsRepository statisticsRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger("stats");
 
